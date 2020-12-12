@@ -6,6 +6,9 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
 from Model.find_faces import detect_face, to_bytes
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files import File
+
 import io
 import base64
 
@@ -41,15 +44,23 @@ class DetectionView(APIView):
             im = Image.open(im_dir)
 
             faces = detect_face(im)
-            faces.save(im_io, 'png')
-            im_io.seek(0)
-            im_io_png = base64.b64encode(im_io.getvalue())
-            context = im_io_png.decode('UTF-8')
+            #faces.save(im_io, 'png')
+            #im_io.seek(0)
+            #im_io_png = base64.b64encode(im_io.getvalue())
+            #context = im_io_png.decode('UTF-8')
             # res = to_bytes(faces)
             #img_byte_arr = io.BytesIO()
             #faces.save(img_byte_arr, format='PNG')
+            #img_tag = mark_safe(f"data:image/png;base64, {context}")
 
-            detection = Detection(image=image, image_after_detection=context)
+            #detection = Detection(image=image, image_after_detection=img_tag)
+
+            faces.save(im_io, 'JPEG')
+            img_after_detect = File(im_io)
+
+            detection = Detection(image=image)
+            detection.image_after_detection.save('a.jpeg', img_after_detect)
+            print(detection.image_after_detection.url)
             serializer = DetectionSerializer(detection)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:

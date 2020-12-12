@@ -67,17 +67,17 @@ function ScanScreen (props) {
     const handleGet = (e) => {
         e.preventDefault();
         let url = 'http://localhost:8000/api/detection/?image=dziadek';
+        let path = './../Backend'
             axios({
                     method: 'get',
                     dataType: 'json',
                     url: url,
-                    headers: { 'Accept': 'application/json',
-                    'Content-Type': 'application/json' }
+                
                 }).then((response) => {
                 console.log(response.data);
                 //console.log(response.data.image_after_detection);
                 setImgState({ 
-                    imageAfter : "data:image/png;base64," + response.data.image_after_detection 
+                    imageAfter : (path + response.data.image_after_detection)
                 });
 
             }).catch((err=>{
@@ -133,7 +133,7 @@ function ScanScreen (props) {
                             </CardContent>
                         </Card>
                         </Grid>
-                        <img src={{uri: `data:image/png;base64,${imgState.imageAfter}`}} />
+                        <img src="C:\Users\User\Desktop\FaceDetectionREST\Backend\media\detections\a_SasurZh.jpeg" />
                     </Grid>
                 </Container>
             </React.Fragment>
