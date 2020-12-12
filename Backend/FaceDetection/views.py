@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
+from Model.find_faces import detect_face
 
 
 class ImageView(APIView):
@@ -32,7 +33,8 @@ class DetectionView(APIView):
         try:
             wich_image = request.query_params["image"]
             image = ImageToDetection.objects.get(pk=wich_image)
-            detection = Detection(image=wich_image, image_after_detection=image)
+            faces = detect_face(image)
+            detection = Detection(image=wich_image, image_after_detection=faces)
             serializer = DetectionSerializer(detection, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
