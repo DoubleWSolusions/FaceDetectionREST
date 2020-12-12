@@ -8,4 +8,4 @@ class ImageToDetection(models.Model):
 
 class Detection(models.Model):
     image = models.ForeignKey(ImageToDetection, on_delete=models.CASCADE)
-    image_after_detection = models.ImageField()
+    image_after_detection = models.ImageField(upload_to='detections')

@@ -1,10 +1,13 @@
 from .models import *
+from PIL import Image
 from .serializers import *
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
-from Model.find_faces import detect_face
+from Model.find_faces import detect_face, to_bytes
+import io
+import base64
 
 
 class ImageView(APIView):
@@ -31,13 +34,26 @@ class DetectionView(APIView):
     def get(self, request, *args, **kwargs):
 
         try:
+            im_io = io.BytesIO()
             wich_image = request.query_params["image"]
-            image = ImageToDetection.objects.get(pk=wich_image)
-            faces = detect_face(image)
-            detection = Detection(image=wich_image, image_after_detection=faces)
-            serializer = DetectionSerializer(detection, many=True)
+            image = ImageToDetection.objects.get(name=wich_image)
+            im_dir = '.' + image.image.url
+            im = Image.open(im_dir)
+
+            faces = detect_face(im)
+            faces.save(im_io, 'png')
+            im_io.seek(0)
+            im_io_png = base64.b64encode(im_io.getvalue())
+            context = im_io_png.decode('UTF-8')
+            # res = to_bytes(faces)
+            #img_byte_arr = io.BytesIO()
+            #faces.save(img_byte_arr, format='PNG')
+
+            detection = Detection(image=image, image_after_detection=context)
+            serializer = DetectionSerializer(detection)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
+        except Exception as e:
+            print(e)
             print('error')
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

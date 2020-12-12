@@ -5,7 +5,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import patches
 
-
 mtcnn = MTCNN(keep_all=True, device='cuda:0')
 
 # Load a single image and display

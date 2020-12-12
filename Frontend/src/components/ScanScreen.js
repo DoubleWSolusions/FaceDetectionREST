@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {Link} from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
@@ -15,13 +16,20 @@ import CardContent from '@material-ui/core/CardContent';
 function ScanScreen (props) {
     const classes = useStyles();
     const [state, setState] = useState({
+        name:'',
         profileImg:'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
     });
     const [imgState, setImgState] = useState({
+        name:'',
         imageAfter:'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
     });
-   
 
+    const handleChange = (e) => {
+        setState({
+            [e.target.id]: e.target.value
+        })
+    };
+   
     const imageHandler = (e) => {
         const reader = new FileReader();
         reader.onload = () =>{
@@ -33,6 +41,50 @@ function ScanScreen (props) {
         reader.readAsDataURL(e.target.files[0])
       };
     
+    const handleImageChange = (e) => {
+        setState({
+            profileImg: e.target.files[0]
+        })
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        let form_data = new FormData();
+        form_data.append('name', state.name);
+        form_data.append('image', state.profileImg, state.profileImg.name);
+        let url = 'http://localhost:8000/api/image/';
+        axios.post(url, form_data, {
+            headers:{
+                'content-type': 'multiport/form-data'
+            }
+        })
+            .then(res =>{
+                console.log(res.data);
+            })
+            .catch(err => console.log(err))
+    }
+
+    const handleGet = (e) => {
+        e.preventDefault();
+        let url = 'http://localhost:8000/api/detection/?image=dziadek';
+            axios({
+                    method: 'get',
+                    dataType: 'json',
+                    url: url,
+                    headers: { 'Accept': 'application/json',
+                    'Content-Type': 'application/json' }
+                }).then((response) => {
+                console.log(response.data);
+                //console.log(response.data.image_after_detection);
+                setImgState({ 
+                    imageAfter : "data:image/png;base64," + response.data.image_after_detection 
+                });
+
+            }).catch((err=>{
+                console.log(err);
+            }))
+    }
+    
     return (
         <div>
             <React.Fragment>
@@ -42,7 +94,7 @@ function ScanScreen (props) {
                         <Grid item xs={12}>
                             <hr className={classes.line}/>
                             <Link to="/" className={classes.link}>
-                                <Button className={classes.newButton}>Wykrywanie twarzy</Button>
+                                <Button className={classes.newButton} onClick={handleGet}>Wykrywanie twarzy</Button>
                             </Link>   
                             <hr className={classes.line}/>
                         </Grid>
@@ -62,7 +114,15 @@ function ScanScreen (props) {
                         </div>
                         </Grid>
                         <Grid item xs={4}>
-                            <Button>Przeprowadź proces</Button>
+                            <form onSubmit={handleSubmit}>
+                                <p>
+                                    <input type="text" placeholder='Name' id='name' value={state.name} onChange={handleChange} required/>
+                                </p>
+                                <p>
+                                    <input type="file" id="image" accept="image/*" height="100%" width="100%" onChange={handleImageChange} required/>
+                                </p>
+                                <input type="submit"/>
+                            </form>
                         </Grid>
                         <Grid item xs={4}>
                         <Card className={classes.cardStyle}>
@@ -73,6 +133,7 @@ function ScanScreen (props) {
                             </CardContent>
                         </Card>
                         </Grid>
+                        <img src={{uri: `data:image/png;base64,${imgState.imageAfter}`}} />
                     </Grid>
                 </Container>
             </React.Fragment>

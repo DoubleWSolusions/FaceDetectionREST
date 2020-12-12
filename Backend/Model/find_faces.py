@@ -19,4 +19,8 @@ def detect_face(img):
     return img_draw
 
 
+def to_bytes(yourimagefile):
+     with open(yourimagefile, "rb") as image_file:
+         base64string = base64.b64encode(image_file.read())
+         return base64string
 
