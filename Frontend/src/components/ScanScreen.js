@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import {Link} from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
@@ -10,6 +9,7 @@ import Button from '@material-ui/core/Button';
 import { blue } from '@material-ui/core/colors';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+import axios from 'axios';
 
 
 
@@ -17,7 +17,8 @@ function ScanScreen (props) {
     const classes = useStyles();
     const [state, setState] = useState({
         name:'',
-        profileImg:'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
+        profileImg:'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
+        profileImg2:'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
     });
     const [imgState, setImgState] = useState({
         name:'',
@@ -26,16 +27,21 @@ function ScanScreen (props) {
 
     const handleChange = (e) => {
         setState({
-            [e.target.id]: e.target.value
+                [e.target.id]: e.target.value
         })
     };
-   
+
+    
+
     const imageHandler = (e) => {
         const reader = new FileReader();
         reader.onload = () =>{
           if(reader.readyState === 2){
             
-            setState({profileImg: reader.result})
+            setState({
+                profileImg2: reader.result,
+                profileImg: e.target.files[0]
+            })
           }
         }
         reader.readAsDataURL(e.target.files[0])
@@ -48,11 +54,10 @@ function ScanScreen (props) {
     }
 
     const handleSubmit = (e) => {
-        e.preventDefault();
         let form_data = new FormData();
         form_data.append('name', state.name);
         form_data.append('image', state.profileImg, state.profileImg.name);
-        let url = 'http://localhost:8000/api/image/';
+        let url = 'api/image';
         axios.post(url, form_data, {
             headers:{
                 'content-type': 'multiport/form-data'
@@ -62,27 +67,6 @@ function ScanScreen (props) {
                 console.log(res.data);
             })
             .catch(err => console.log(err))
-    }
-
-    const handleGet = (e) => {
-        e.preventDefault();
-        let url = 'http://localhost:8000/api/detection/?image=dziadek';
-        let path = './../Backend'
-            axios({
-                    method: 'get',
-                    dataType: 'json',
-                    url: url,
-                
-                }).then((response) => {
-                console.log(response.data);
-                //console.log(response.data.image_after_detection);
-                setImgState({ 
-                    imageAfter : (path + response.data.image_after_detection)
-                });
-
-            }).catch((err=>{
-                console.log(err);
-            }))
     }
     
     return (
@@ -94,37 +78,32 @@ function ScanScreen (props) {
                         <Grid item xs={12}>
                             <hr className={classes.line}/>
                             <Link to="/" className={classes.link}>
-                                <Button className={classes.newButton} onClick={handleGet}>Wykrywanie twarzy</Button>
+                                <Button className={classes.newButton}>Wykrywanie twarzy</Button>
                             </Link>   
                             <hr className={classes.line}/>
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={6}>
                         <Card className={classes.cardStyle}>
                             <CardContent>
                                 <Typography color="textSecondary">               
-                                    <img src={state.profileImg} alt="logo" id="img" height="100%" width="100%"/>
+                                    <img src={state.profileImg2} alt="logo" id="img" height="100%" width="100%"/>
                                 </Typography>
                             </CardContent>
                         </Card>
-                        <div className={classes.label} >
-                            <input type="file" accept="image/*"  id="input" onChange={imageHandler} />
-                                <div >
-                                    <label htmlFor="input"></label>
-                                </div>
+                        <div className={classes.label} >                 
+                        <form onSubmit={handleSubmit}>
+                            <p>
+                                <input type="text" placeholder='Name' id='name' value={state.name} onChange={handleChange} required/>
+                            </p>
+                            <p>
+                                <input type="file" id="input" accept="image/*" onChange={imageHandler} required/> 
+                            </p>
+                            <input type="submit" value="Wyślij" />
+                        </form>
                         </div>
+
                         </Grid>
-                        <Grid item xs={4}>
-                            <form onSubmit={handleSubmit}>
-                                <p>
-                                    <input type="text" placeholder='Name' id='name' value={state.name} onChange={handleChange} required/>
-                                </p>
-                                <p>
-                                    <input type="file" id="image" accept="image/*" height="100%" width="100%" onChange={handleImageChange} required/>
-                                </p>
-                                <input type="submit"/>
-                            </form>
-                        </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={6}>
                         <Card className={classes.cardStyle}>
                             <CardContent>
                                 <Typography color="textSecondary">
@@ -133,7 +112,6 @@ function ScanScreen (props) {
                             </CardContent>
                         </Card>
                         </Grid>
-                        <img src="C:\Users\User\Desktop\FaceDetectionREST\Backend\media\detections\a_SasurZh.jpeg" />
                     </Grid>
                 </Container>
             </React.Fragment>
@@ -187,10 +165,11 @@ function ScanScreen (props) {
             minHeight: 125,
             maxWidth: 300,
             maxHeight: 300,
-            textAlign: 'center'
+           
         },
         label:{
             marginTop: '1rem',
-        }
+            textAlign: 'left',
+        },
       }));
   export default ScanScreen;
