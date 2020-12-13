@@ -53,11 +53,14 @@ function ScanScreen (props) {
         })
     }
 
+
+
     const handleSubmit = (e) => {
+        e.preventDefault();
         let form_data = new FormData();
         form_data.append('name', state.name);
         form_data.append('image', state.profileImg, state.profileImg.name);
-        let url = 'api/image';
+        let url = 'http://fb7de35755e1.ngrok.io/api/image/';
         axios.post(url, form_data, {
             headers:{
                 'content-type': 'multiport/form-data'
@@ -67,6 +70,26 @@ function ScanScreen (props) {
                 console.log(res.data);
             })
             .catch(err => console.log(err))
+    }
+
+    const handleGet = (e) => {
+        e.preventDefault();
+        let url = 'http://fb7de35755e1.ngrok.io/api/detection3/?image=dziadek';
+            axios({
+                    method: 'get',
+                    dataType: 'json',
+                    url: url,
+                
+                }).then((response) => {
+                console.log(response.data);
+                //console.log(response.data.image_after_detection);
+                setImgState({ 
+                    imageAfter : response.data.image_after_detection
+                });
+
+            }).catch((err=>{
+                console.log(err);
+            }))
     }
     
     return (
@@ -82,7 +105,7 @@ function ScanScreen (props) {
                             </Link>   
                             <hr className={classes.line}/>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={4}>
                         <Card className={classes.cardStyle}>
                             <CardContent>
                                 <Typography color="textSecondary">               
@@ -103,7 +126,10 @@ function ScanScreen (props) {
                         </div>
 
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={4}>
+                            <Button onClick={handleGet}>Przeprowadź detekcję</Button>
+                        </Grid>
+                        <Grid item xs={4}>
                         <Card className={classes.cardStyle}>
                             <CardContent>
                                 <Typography color="textSecondary">
