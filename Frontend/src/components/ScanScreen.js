@@ -175,14 +175,14 @@ function ScanScreen (props) {
                         </form>
                         {!stateGet.isLoading ? (
                             stateGet.users.map(user =>{
-                                const { id, name, image_url } = user;
+                                const { id, image_url } = user;
                                 return (
                                     <div key={id}>
                                     <p>Id: {id}</p>
                                     <div>
-                                    <img src={image_url} alt={name} className={classes.cardStyle}/>
+                                    <img src={image_url} className={classes.cardStyle}/>
                                     </div>
-                                    <hr />
+                                    <hr/>
                                     </div>
                                 );
                             })

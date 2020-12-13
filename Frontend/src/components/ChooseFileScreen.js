@@ -69,6 +69,9 @@ function ChooseFileScreen (props) {
                 console.log(res.data);
             })
             .catch(err => console.log(err))
+        setState({
+            profileImg2: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
+        })
     }
 
 
@@ -103,9 +106,6 @@ function ChooseFileScreen (props) {
                         </Card>
                         <div className={classes.label} >                 
                         <form onSubmit={handleSubmit}>
-                            <p>
-                                <input type="text" placeholder='Nazwa' id='nazwa' value={state.nazwa} onChange={handleChange} required/>
-                            </p>
                             <p>
                                 <input type="file" id="input" accept="image/*" onChange={imageHandler} required/> 
                             </p>
