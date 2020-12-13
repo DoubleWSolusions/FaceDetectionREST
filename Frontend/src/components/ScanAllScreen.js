@@ -13,21 +13,10 @@ import axios from 'axios';
 
 
 
-
-
-function ScanScreen (props) {
+function ScanAllScreen (props) {
     const classes = useStyles();
-    const [stateGet, setStateGet] = useState({
-        isLoading: true,
-        users: [],
-        error: null,
-
-    })
-    const [stateID, setStateID] = useState({
-        id:'',
-    });
     const [state, setState] = useState({
-        nazwa:'',
+        url:'',
         profileImg:'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
         profileImg2:'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
     });
@@ -36,50 +25,19 @@ function ScanScreen (props) {
         imageAfter:'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
     });
 
-    const [componentState, setComponentState] = useState({
-        source: null,
-    })
 
     const handleChange = (e) => {
         setState({
                 [e.target.id]: e.target.value
         })
     };
-    const handleChangeID = (e) => {
-        setStateID({
-                [e.target.id]: e.target.value
-        })
-    };
-
-    
-
-    const imageHandler = (e) => {
-        const reader = new FileReader();
-        reader.onload = () =>{
-          if(reader.readyState === 2){
-            
-            setState({
-                profileImg2: reader.result,
-                profileImg: e.target.files[0]
-            })
-          }
-        }
-        reader.readAsDataURL(e.target.files[0])
-      };
-    
-    const handleImageChange = (e) => {
-        setState({
-            profileImg: e.target.files[0]
-        })
-    }
 
 
 
     const handleSubmit = (e) => {
         e.preventDefault();
         let form_data = new FormData();
-        form_data.append('name', state.nazwa);
-        form_data.append('image', state.profileImg, state.profileImg.name);
+        form_data.append('url', state.url);
         let url = 'http://fb7de35755e1.ngrok.io/api/image/';
         axios.post(url, form_data, {
             headers:{
@@ -91,14 +49,14 @@ function ScanScreen (props) {
             })
             .catch(err => console.log(err))
     }
+    
 
     const handleGet = (e) => {
         e.preventDefault();
-        let url = 'http://fb7de35755e1.ngrok.io/api/detection3/?image=';
             axios({
                     method: 'get',
                     dataType: 'json',
-                    url: url + stateID.id,
+                    url: 'http://fb7de35755e1.ngrok.io/api/detection4/?url=' + state.url,
                 
                 }).then((response) => {
                 console.log(response.data);
@@ -127,30 +85,15 @@ function ScanScreen (props) {
             setImgState({ imageAfter: "data:;base64," + base64 });
           });
         }
-
-
-    const atStart = ()=>{
-            axios.get('http://fb7de35755e1.ngrok.io/api/image/')
-                .then((response) => {
-                    setStateGet({
-                        users: response.data,
-                        isLoading: false
-                    });
-                }).catch((err=>{
-                    console.log(err);
-                }))
-        }
-    
     return (
         <div>
-            
             <React.Fragment>
             <CssBaseline />
                 <Container fixed className={classes.containerB}>
                     <Grid container spacing = {3} className={classes.textPanel}>
                         <Grid item xs={12}>
-                        <hr className={classes.line}/>
-                        <Link to="/Scan" className={classes.link}>
+                            <hr className={classes.line}/>
+                            <Link to="/Scan" className={classes.link}>
                                 <Button className={classes.newButton}>Sprawdzanie detekcji</Button>
                             </Link>    
                             <Link to="/ScanAll" className={classes.link}>
@@ -158,50 +101,23 @@ function ScanScreen (props) {
                             </Link>
                             <Link to="/ChooseFile" className={classes.link}>
                                 <Button className={classes.newButton}>Wstaw zdjęcie</Button>
-                            </Link>                         
+                            </Link>                       
                             <hr className={classes.line}/>
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={6} className={classes.xsGrid}>
                         <div className={classes.label} >                 
-                        <form>
+                        <form >
+                            <h2>Podaj url zdjęcia</h2>
                             <p>
-                                <input type="text" placeholder='id' id='id' value={stateID.id} onChange={handleChangeID} required/>
-                            </p>
-
-                            <p>
-                            <Button onClick={atStart} className={classes.margintop}>Pokaż zdjęcia w bazie</Button>
-                            </p>
-                            
+                                <input type="text" placeholder='Url' id='url' value={state.url} onChange={handleChange} required/>
+                            </p>               
                         </form>
-                        {!stateGet.isLoading ? (
-                            stateGet.users.map(user =>{
-                                const { id, name, image_url } = user;
-                                return (
-                                    <div key={id}>
-                                    <p>Id: {id}</p>
-                                    <div>
-                                    <img src={image_url} alt={name} className={classes.cardStyle}/>
-                                    </div>
-                                    <hr />
-                                    </div>
-                                );
-                            })
-                        ):(
-                            <h3>Czekam na wczytanie</h3>
-                        )
-
-                        }
-                    
-
+                        <Button onClick={handleGet} className={classes.margintop}>Przeprowadź detekcję</Button>
                         </div>
 
+
                         </Grid>
-                        <Grid item xs={4}>
-                            <p>
-                                <Button onClick={handleGet} className={classes.margintop}>Wyślij zapytanie o zdjęcie</Button>
-                            </p>
-                        </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={6} className={classes.xsGrid}>
                         <Card className={classes.cardStyle}>
                             <CardContent>
                                 <Typography color="textSecondary">
@@ -259,10 +175,9 @@ function ScanScreen (props) {
             textDecoration: 'none',
         },
         cardStyle:{
-            minWidth: 125,
-            minHeight: 125,
-            maxWidth: 250,
-            maxHeight: 250,
+            maxWidth: 300,
+            maxHeight: 300,
+            alignItems: 'center'
            
         },
         label:{
@@ -272,5 +187,14 @@ function ScanScreen (props) {
         margintop:{
             marginTop: '1rem',
         },
+        xsGrid:{
+            maxWidth: '50%',
+            flexBasis: '50%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            /* text-align: center; */
+            direction: 'collumn',
+            display: 'flex',
+        },
       }));
-  export default ScanScreen;
+  export default ScanAllScreen;

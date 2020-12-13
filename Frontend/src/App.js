@@ -7,6 +7,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 
 import ScanScreen from './components/ScanScreen';
+import ScanAllScreen from './components/ScanAllScreen';
+import ChooseFileScreen from './components/ChooseFileScreen';
 
 function App() {
   const classes = useStyles();
@@ -17,7 +19,7 @@ function App() {
           <AppBar position="static">
             <Toolbar className={classes.bar}>
               <Typography variant="h2" className={classes.title}>
-                Human Face Experiment
+                <Link to="/" className={classes.link}>Human Face Experiment</Link>
               </Typography>
             </Toolbar>
           </AppBar>
@@ -30,6 +32,8 @@ function App() {
               </h2>
               <Route path="/" exact={true} component={HomeScreen}/>
               <Route path="/Scan" component={ScanScreen}/>
+              <Route path="/ScanAll" component={ScanAllScreen}/>
+              <Route path="/ChooseFile" component={ChooseFileScreen}/>
             </div>
           </main>
       </div>
@@ -60,6 +64,12 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
     marginTop: "2%",
     color: '#707070',
-}
+},
+link :{
+  textDecoration: 'none',
+  backgroundColor: 'transparent !important' ,
+  fontFamily: "Arial",
+  color: '#707070',
+},
 }));
 export default App;

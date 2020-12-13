@@ -23,8 +23,14 @@ function HomeScreen (props) {
                         <Grid item xs={12}>
                             <hr className={classes.line}/>
                             <Link to="/Scan" className={classes.link}>
-                                <Button className={classes.newButton}>Wykrywanie twarzy</Button>
-                            </Link>                         
+                                <Button className={classes.newButton}>Sprawdzanie detekcji</Button>
+                            </Link>    
+                            <Link to="/ScanAll" className={classes.link}>
+                                <Button className={classes.newButton}>Detekcja po podaniu url</Button>
+                            </Link>
+                            <Link to="/ChooseFile" className={classes.link}>
+                                <Button className={classes.newButton}>Wstaw zdjęcie</Button>
+                            </Link>                        
                             <hr className={classes.line}/>
                         </Grid>
                         <Grid item xs={6}>
